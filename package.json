@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/koa": "^2.0.46",
     "@types/node": "^10.5.2",
+    "apollo-boost": "^0.1.10",
     "koa": "^2.5.1"
   },
   "devDependencies": {
