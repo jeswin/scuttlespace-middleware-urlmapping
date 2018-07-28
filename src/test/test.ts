@@ -30,6 +30,6 @@ describe("scuttlespace-middleware-urlmapping", async () => {
     mapper(ctx, next);
     console.log(ctx);
 
-    shouldLib.exist(ctx.user);
+    shouldLib.exist(ctx.account);
   });
 });
