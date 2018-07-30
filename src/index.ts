@@ -5,38 +5,43 @@ import { Context } from "koa";
 
 export default function(opts: {
   domain: string;
-  apolloClient: ApolloClient<any>
+  apolloClient: ApolloClient<any>;
 }) {
-  return async function urlMapper(ctx: Context, next: NextFunction) {
+  return async function urlMapper(ctx: any, next: NextFunction) {
     const fullHostname = ctx.request.header.host.toLowerCase();
+
     const hostname = fullHostname.startsWith("www.")
       ? fullHostname.substring(4)
       : fullHostname;
 
-    if (hostname === opts.domain.toLowerCase()) {
-      const parts = ctx.path.split("/");
-      const username = parts.length > 1 ? parts[1] : undefined;
-      const result = await opts.apolloClient.query({
-        query: gql`
-          {
-            hello
-          }
-        `
-      });
-      console.log(result);
-      (ctx as any).account = result;
-    } else {
-      const parts = ctx.path.split("/");
-      const username = parts.length > 1 ? parts[1] : undefined;
-      const result = await opts.apolloClient.query({
-        query: gql`
-          {
-            hello
-          }
-        `
-      });
-      (ctx as any).account = result;
-    }
+    /* 
+      Check if we're on our own domain.
+      If we are, then check if there's a user directory mentioned in the path
+        eg: scuttle.space/jeswin, where jeswin is the username.
+    */
+    const username =
+      hostname === opts.domain.toLowerCase()
+        ? (() => {
+            const parts = ctx.path.split("/");
+            return parts.length > 1 ? parts[1] : undefined;
+          })()
+        : await (async () => {
+            const result = await opts.apolloClient.query({
+              query: gql`
+                query Domain {
+                  domain(hostname: ${hostname}) {
+                    user {
+                      username
+                    }
+                  }
+                }
+              `
+            });
+            console.log(result);
+          })();
+
+    ctx.username = username;
+
     next();
   };
 }
