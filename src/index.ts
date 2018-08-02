@@ -10,9 +10,10 @@ export default function(opts: {
   return async function urlMapper(ctx: any, next: NextFunction) {
     const fullHostname = ctx.request.header.host.toLowerCase();
 
-    const hostname = fullHostname.startsWith("www.")
+    const hostname = (fullHostname.startsWith("www.")
       ? fullHostname.substring(4)
-      : fullHostname;
+      : fullHostname
+    ).toLowerCase();
 
     /* 
       Check if we're on our own domain.
@@ -28,16 +29,14 @@ export default function(opts: {
         : await (async () => {
             const result = await opts.apolloClient.query({
               query: gql`
-                query Domain {
-                  domain(hostname: ${hostname}) {
-                    user {
-                      username
-                    }
+                query UserByDomain {
+                  user(domain: "${hostname}") {
+                    username
                   }
                 }
               `
             });
-            console.log(result);
+            return result.data.user ? result.data.user.username : undefined;
           })();
 
     ctx.username = username;
