@@ -20,14 +20,16 @@ export default function(opts: {
       If we are, then check if there's a user directory mentioned in the path
         eg: scuttle.space/jeswin, where jeswin is the username.
     */
-    const username =
+    const result: { username?: string; isLocal: boolean } =
       hostname === opts.domain.toLowerCase()
         ? (() => {
             const parts = ctx.path.split("/");
-            return parts.length > 1 ? parts[1] : undefined;
+            return parts.length > 1
+              ? { username: parts[1], isLocal: true }
+              : { isLocal: true };
           })()
         : await (async () => {
-            const result = await opts.apolloClient.query({
+            const graphqlResult: any = await opts.apolloClient.query({
               query: gql`
                 query UserByDomain {
                   user(domain: "${hostname}") {
@@ -36,10 +38,22 @@ export default function(opts: {
                 }
               `
             });
-            return result.data.user ? result.data.user.username : undefined;
+            const maybeUsername =
+              graphqlResult.data && graphqlResult.data.user
+                ? graphqlResult.data.user.username
+                : undefined;
+            return {
+              isLocal: false,
+              username: maybeUsername
+            };
           })();
 
-    ctx.username = username;
+    if (result.username && !result.isLocal) {
+      ctx.path = `/${result.username}${ctx.path}`;
+      ctx.url = `/${result.username}${ctx.url}`;
+    }
+
+    ctx.scuttlespace = result;
 
     next();
   };
