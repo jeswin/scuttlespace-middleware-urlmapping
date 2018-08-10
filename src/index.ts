@@ -1,7 +1,6 @@
 import ApolloClient from "apollo-client";
 import { NextFunction } from "connect";
 import gql from "graphql-tag";
-import { Context } from "koa";
 
 export default function(opts: {
   domain: string;
