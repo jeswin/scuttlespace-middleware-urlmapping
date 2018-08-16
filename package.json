@@ -1,11 +1,10 @@
 {
   "name": "scuttlespace-middleware-urlmapping",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "main": "dist/index",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "./build.sh",
     "test": "./build.sh && mocha dist/test/test.js"
   },
   "license": "AGPL-1.0",
