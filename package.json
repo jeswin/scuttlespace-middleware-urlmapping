@@ -23,7 +23,10 @@
     "apollo-link-error": "^1.1.0",
     "apollo-link-http": "^1.5.4",
     "cross-fetch": "^2.2.2",
-    "mocha": "^5.2.0",
+    "camelcase": "^5.0.0",
+    "gql2ts": "^1.8.2",
+    "mocha": "5.2.0",
+    "prettier": "^1.14.2",
     "should": "^13.2.1"
   }
 }

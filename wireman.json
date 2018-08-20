@@ -1,0 +1,4 @@
+{
+  "build": "./build.sh",
+  "localDependencies": ["scuttlespace-service-user-graphql-schema"]
+}

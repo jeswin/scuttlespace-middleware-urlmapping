@@ -1,6 +1,8 @@
 import ApolloClient from "apollo-client";
 import { NextFunction } from "connect";
 import gql from "graphql-tag";
+import { queryUserByDomain } from "./schemaTypes";
+import apolloClient from "./test/apollo-client";
 
 export default function(opts: {
   domain: string;
@@ -28,15 +30,10 @@ export default function(opts: {
               : { isLocal: true };
           })()
         : await (async () => {
-            const graphqlResult: any = await opts.apolloClient.query({
-              query: gql`
-                query UserByDomain {
-                  user(domain: "${hostname}") {
-                    username
-                  }
-                }
-              `
-            });
+            const graphqlResult = await queryUserByDomain(
+              { args: opts.domain },
+              apolloClient
+            );
             const maybeUsername =
               graphqlResult.data && graphqlResult.data.user
                 ? graphqlResult.data.user.username
